@@ -140,7 +140,7 @@ ansible-playbook -i inventory.yml -l webservers site.yml --become
 ansible-playbook -i inventory.yml -l loadbalancers site.yml --become 
 ```
 
-## Ansible tags
+#### Ansible tags
 
 The following tags are defined in playbooks:
 
@@ -150,7 +150,7 @@ The following tags are defined in playbooks:
 |                         update | Run dokcer compose and Configuring files  (image tag sould be update befor run) 
 |                   haproxy-role | Configuring haproxy.cfg
 |                       php-role | Configuring php.ini
-|            docker-compose-role | update/build docker-compose, for restart set 'docker_compose__restart', yes.
+|            docker-compose-role | update/build docker-compose, for restart set 'docker_compose__restart' variable yes.
 
 ### Test
 
