@@ -175,7 +175,7 @@ ssh -NL 127.0.0.1:1936:127.0.0.1:1936 (haproxy server ip)
 
 ### Security / reliability tips
 
-#### relibility
+#### Relibility
 
 1- Set resorce limitashion for our contaners. We can also regulate the number of connections with the number of resources.
 ``` yaml
