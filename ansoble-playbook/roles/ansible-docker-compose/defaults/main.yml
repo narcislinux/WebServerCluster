@@ -2,13 +2,8 @@ docker_compose__debug: ""
 docker_compose__restart: "no"
 docker_compose__projects:
   webserver:
-    project_name: webserver
-    src: webserver
+    project_name: service
+    src: servis
     dest: /opt/docker-compose/
     scale_app: 1
     state: "present"
-  # loadbalancer:
-  #   src: loadbalancer
-  #   dest: /opt/loadbalancer
-  #   scale_app: 1
-  #   state: "present"

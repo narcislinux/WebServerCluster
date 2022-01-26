@@ -9,11 +9,4 @@ services:
     ports:
       - '80:80'
       - '127.0.0.1:1936:1936'
-    deploy:
-      resources:
-        limits:
-          cpus: '0.001'
-          memory: 50M
-        reservations:
-          cpus: '0.0001'
-          memory: 20M
+
