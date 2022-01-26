@@ -1,0 +1,12 @@
+version: '3.6'
+
+services:
+  haproxy:
+    image: haproxy:1.3
+    build: 
+      context: ./
+    restart: always  
+    ports:
+      - '80:80'
+      - '127.0.0.1:1936:1936'
+

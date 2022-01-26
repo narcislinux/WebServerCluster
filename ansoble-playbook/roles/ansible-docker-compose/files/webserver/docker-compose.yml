@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  web-server:
+    image: nginx-php:1
+    build: 
+      context: ./
+    restart: always  
+    ports:
+      - "8080:80"
+

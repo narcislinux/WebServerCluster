@@ -1,0 +1,75 @@
+---
+
+# ansible-docker role variables
+docker__users: ["{{ ansible_env.SUDO_USER | d('root') }}"]
+docker__login_become_user: "{{ docker__users | first | d('root') }}"
+
+docker__key:
+  docker-repo:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+docker__proxy_env:
+  http_proxy: ""
+  https_proxy: ""
+
+docker__repo:
+  docker:
+    url: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    state: present
+    filename: docker-repo
+
+docker__package:
+  dependencies:
+    name: 
+      - apt-transport-https 
+      - ca-certificates 
+      - cron 
+      - gnupg2 
+      - zsh
+      - software-properties-common
+    state: present
+    purge: no
+    update_cache: yes
+  pip-dependencies:
+    name: 
+      - gcc 
+      - python3-setuptools 
+      - python3-dev 
+      - python3-pip 
+      - python3-docker
+    state: present
+    purge: no
+    update_cache: yes
+  docker:
+    name: docker-ce  
+    state: present
+    purge: no
+    update_cache: yes
+  docker-compose:
+    name: docker-compose  
+    state: present
+    purge: no
+    update_cache: yes
+
+
+docker__cron_jobs:
+  docker-disk-clean-up:
+    name: "Docker disk clean up"
+    job: "docker system prune -af > /dev/null 2>&1"
+    minute: "0"
+    hour: "0"
+    day: "*"
+    month: "*"
+    weekday: "0"
+    cron_file: "docker-disk-clean-up"
+    user:  "{{ (docker__users | first) | d('root') }}"
+    state: "present"
+
+docker__registries: []
+docker__default_daemon_json: |
+  "log-driver": "journald"
+docker__daemon_flags:
+  - "-H unix://"
+docker__daemon_environment: []
+docker__systemd_override: ""

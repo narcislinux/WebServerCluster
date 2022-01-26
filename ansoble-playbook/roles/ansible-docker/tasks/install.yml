@@ -1,0 +1,36 @@
+---
+- name: Docker | Ubuntu installation | adding and removing public GPG keys to the apt repo
+  apt_key: 
+    url: "{{ docker__key[item].url }}" 
+    state: "{{ docker__key[item].state }}" 
+  with_items: "{{ docker__key | list }}"
+  environment: "{{ docker__proxy_env }}"
+  when:  docker__key
+  tags: 
+    - apt_key
+
+- name: Docker | Ubuntu installation | adding and removing repos 
+  apt_repository: 
+    repo: "{{ docker__repo[item].url }} "
+    state: "{{ docker__repo[item].state }}" 
+    filename: "{{ docker__repo[item].filename | default('') }}"
+  environment: "{{ docker__proxy_env }}"
+  with_items: "{{ docker__repo | list }}"
+  when:  docker__repo
+  tags: 
+    - apt_repo
+
+- name: Docker | Ubuntu installation | installing and removing packages
+  apt: 
+    name: "{{ docker__package[item].name }}" 
+    state: "{{ docker__package[item].state }}" 
+    update_cache: "{{ docker__package[item].update_cache }}"
+    purge: "{{ docker__package[item].purge | default(no) }}"
+  with_items: "{{ docker__package | list }}"
+  environment: "{{ docker__proxy_env }}"
+  when:  docker__package
+  tags: 
+    - apt_install
+
+- name: Docker | restart Docker 
+  meta: "flush_handlers"

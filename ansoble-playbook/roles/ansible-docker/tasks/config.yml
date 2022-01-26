@@ -1,0 +1,110 @@
+- name: Docker | Add users to docker group
+  user:
+    name: "{{ item }}"
+    groups: "docker"
+    append: true
+  loop: "{{ docker__users }}"
+  when:
+    - docker__users
+
+- name: Docker | create docker disk clean up cron jobs
+  cron:
+    name: "{{ docker__cron_jobs[item].name }}"
+    job: "{{ docker__cron_jobs[item].job }}"
+    minute: "{{ docker__cron_jobs[item].minute }}"
+    hour: "{{ docker__cron_jobs[item].hour }}"
+    day: "{{ docker__cron_jobs[item].day }}"
+    month: "{{ docker__cron_jobs[item].month }}"
+    weekday: "{{ docker__cron_jobs[item].weekday }}"
+    cron_file: "{{ docker__cron_jobs[item].cron_file }}"
+    user: "{{ docker__cron_jobs[item].user | d('root') }}"
+  with_items: "{{ docker__cron_jobs | list }}"
+  when:
+    - docker__cron_jobs[item].state | d("present") != "absent"
+  tags: 
+    - cron_config
+
+
+
+- name: Docker | service configuration
+  block:
+    - name: Configuration directories
+      file:
+        path: "{{ item }}"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      loop:
+        - "/etc/docker"
+        - "/etc/systemd/system/docker.service.d"
+    
+    - name: Configure docker daemon options json
+      template:
+        src: "etc/docker/daemon.json.j2"
+        dest: "/etc/docker/daemon.json"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      when: docker__default_daemon_json | d() or docker__daemon_json | d()
+    
+    - name: Configure docker daemon options flags
+      template:
+        src: "etc/systemd/system/docker.service.d/options.conf.j2"
+        dest: "/etc/systemd/system/docker.service.d/options.conf"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: docker__register_daemon_flags
+      when: docker__daemon_flags | d()
+      notify: ["Restart Docker"]
+    
+    - name: Configure docker daemon environment variables
+      template:
+        src: "etc/systemd/system/docker.service.d/environment.conf.j2"
+        dest: "/etc/systemd/system/docker.service.d/environment.conf"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: docker__register_daemon_environment
+      when: docker__daemon_environment | d()
+      notify: ["Restart Docker"]
+    
+    - name: Configure custom systemd unit file override
+      template:
+        src: "etc/systemd/system/docker.service.d/custom.conf.j2"
+        dest: "/etc/systemd/system/docker.service.d/custom.conf"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+      register: docker__register_custom_override
+      when: docker__systemd_override | d()
+      notify: ["Restart Docker"]
+    
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: true
+      when: docker__register_daemon_flags is changed
+            or docker__register_daemon_environment is changed
+            or docker__register_custom_override is changed
+    
+    - name: Restart Docker now to make sure `docker login` works
+      meta: "flush_handlers"
+
+- name: Docker | manage Docker registry login credentials
+  docker_login:
+    registry_url: "{{ item.registry_url | d(omit) }}"
+    username: "{{ item.username }}"
+    password: "{{ item.password }}"
+    email: "{{ item.email | d(omit) }}"
+    reauthorize: "{{ item.reauthorize | d(omit) }}"
+    config_path: "{{ item.config_path | d(omit) }}"
+    state: "{{ item.state | d('present') }}"
+  loop: "{{ docker__registries }}"
+  loop_control:
+    label: '{{ {"registry_url": item.registry_url | d("https://index.docker.io/v1/"), "username": item.username, "state": item.state | d("present")} }}'
+  when: item.username | d() and item.password | d()
+  become: true
+  become_user: "{{ docker__login_become_user | d('root') }}"
+  vars:
+    ansible_python_interpreter: "{{ '/usr/bin/env python3-docker' }}"

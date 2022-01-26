@@ -1,0 +1,9 @@
+
+- name: Place PHP configuration file in place.
+  template:
+    src: php.ini.j2
+    dest: "{{ php_conf_paths }}"
+  tags:
+    - php-configuration-update-file
+  delegate_to: localhost
+  become: no

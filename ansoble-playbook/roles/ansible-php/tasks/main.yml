@@ -1,0 +1,5 @@
+---
+
+- include: configure.yml
+  tags:
+    - php_configure

@@ -1,0 +1,10 @@
+---
+  
+- name: configuration | update file
+  template:
+    src: "{{ haproxy_conf_template }}"
+    dest: "{{ haproxy_conf_dest }}"
+  tags:
+    - haproxy-configuration-update-file
+  delegate_to: localhost
+  become: no

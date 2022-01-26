@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+
+global
+  log /dev/log local0
+  log /dev/log local1 notice
+  maxconn 200000
+
+defaults
+  mode http
+  log global
+  option  redispatch
+  timeout connect 5s
+  timeout client 50s
+  timeout server 50s
+
+
+{% include 'listen.cfg.j2' %}
+
+{% include 'frontend.cfg.j2' %}
+
+{% include 'backend.cfg.j2' %}
