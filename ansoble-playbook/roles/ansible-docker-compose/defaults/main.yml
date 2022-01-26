@@ -1,5 +1,5 @@
 docker_compose__debug: ""
-docker_compose__restart: "true"
+docker_compose__restart: "no"
 docker_compose__projects:
   webserver:
     project_name: webserver

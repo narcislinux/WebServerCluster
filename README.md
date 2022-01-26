@@ -103,31 +103,30 @@ In the site.yml file, you can see how roles are categorized based on host invent
 - hosts: webservers
   roles:
     - role: ansible-docker
-      tags: ['docker-role','webserver_install']
+      tags: ['docker-role']
 
     - role: ansible-php
-      tags: ['php-role','webserver_install','webserver_update','update']
+      tags: ['php-role','update']
 
     - role: ansible-docker-compose
-      tags: ['docker-compose-role','webserver_install','webserver_update','update']
+      tags: ['docker-compose-role','update']
 
 - hosts: loadbalancers
   roles:
     - role: ansible-docker
-      tags: ['docker-role','loadbalancer_install']
+      tags: ['docker-role']
 
     - role: ansible-haproxy
-      tags: ['haproxy-role','loadbalancer_install','loadbalancer_update','update']
+      tags: ['haproxy-role','update']
 
     - role: ansible-docker-compose
-      tags: ['docker-compose-role','loadbalancer_install','loadbalancer_update','update']
+      tags: ['docker-compose-role','update']
 ```
 
 ### Usage
 
-You can see some useful examples of how a project can be used. 
+Run project like this:
 
-#### Full config and install (Docker, Docker-compose, services) 
 ``` bash
 cd ansible-playbook
 
@@ -135,51 +134,23 @@ cd ansible-playbook
 ansible-playbook -i inventory.yml -l all site.yml --become 
 
 ## Webserver 
-ansible-playbook -i inventory.yml -l webservers --tags webserver_install site.yml --become 
+ansible-playbook -i inventory.yml -l webservers site.yml --become 
 
 ## Loadbalanceer
-ansible-playbook -i inventory.yml -l loadbalancers --tags loadbalancer_install site.yml --become 
+ansible-playbook -i inventory.yml -l loadbalancers site.yml --become 
 ```
 
-#### Install/Manage Docker and docker compose:
-``` bash
-cd ansible-playbook 
+## Ansible tags
 
-## All nodes 
-ansible-playbook -i inventory.yml -l all --tags dokcer-role site.yml --become 
+The following tags are defined in playbooks:
 
-## Webserver 
-ansible-playbook -i inventory.yml -l webservers --tags dokcer-role site.yml --become 
-
-## Loadbalanceer
-ansible-playbook -i inventory.yml -l loadbalancers --tags dokcer-role site.yml --become 
-```
-
-#### Update services configuration and Docker images:
-
-1- Update image tags:
-
-``` yaml
-services:
-  haproxy:
-    image: haproxy:1.1  # <--- Update image tag
-    build: 
-      context: ./
-```
-2- run ansible role
-``` bash
-cd ansible-playbook
-
-## All nodes 
-ansible-playbook -i inventory.yml -l all --tags dokcer-role site.yml --become 
-
-## Webserver 
-ansible-playbook -i inventory.yml -l webservers --tags dokcer-role site.yml --become 
-
-## Loadbalanceer
-ansible-playbook -i inventory.yml -l loadbalancers --tags dokcer-role site.yml --become 
-```
-
+|                       Tag name | Used for                                        
+|--------------------------------|-------------------------------------------------
+|                    docker-role | Installing/Configuring docker and docker-compose services 
+|                         update | Run dokcer compose and Configuring files  (image tag sould be update befor run) 
+|                   haproxy-role | Configuring haproxy.cfg
+|                       php-role | Configuring php.ini
+|            docker-compose-role | update/build docker-compose, for restart set 'docker_compose__restart', yes.
 
 ### Test
 
