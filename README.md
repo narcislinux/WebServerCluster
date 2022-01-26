@@ -164,7 +164,7 @@ cd ../ansible-playbook
 ansible-playbook -i ../vagrant/inventory.yml -l all --tags dokcer-role site.yml --become 
 ```
 
-### monitoring
+### Monitoring
 You can forward port to see the haproxy dashboard:
 
 ```bash
