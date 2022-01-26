@@ -1,0 +1,4 @@
+
+# - src: https://github.com/GROG/ansible-role-user
+#   version: v1.3.0
+#   name: GROG.user

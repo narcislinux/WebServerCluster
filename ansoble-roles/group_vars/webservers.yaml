@@ -1,0 +1,132 @@
+---
+
+# ansible-docker role variables
+docker__users: ["{{ ansible_env.SUDO_USER | d('root') }}"]
+docker__login_become_user: "{{ docker__users | first | d('root') }}"
+
+docker__key:
+  docker-repo:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+docker__proxy_env:
+  http_proxy: ""
+  https_proxy: ""
+
+docker__repo:
+  docker:
+    url: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    state: present
+    filename: docker-repo
+
+docker__package:
+  dependencies:
+    name: 
+      - apt-transport-https 
+      - ca-certificates 
+      - cron 
+      - gnupg2 
+      - zsh
+      - software-properties-common
+    state: present
+    purge: no
+    update_cache: yes
+  pip-dependencies:
+    name: 
+      - gcc 
+      - python3-setuptools 
+      - python3-dev 
+      - python3-pip 
+      - python3-docker
+    state: present
+    purge: no
+    update_cache: yes
+  docker:
+    name: docker-ce  
+    state: present
+    purge: no
+    update_cache: yes
+  docker-compose:
+    name: docker-compose  
+    state: present
+    purge: no
+    update_cache: yes
+
+
+docker__cron_jobs:
+  docker-disk-clean-up:
+    name: "Docker disk clean up"
+    job: "docker system prune -af > /dev/null 2>&1"
+    minute: "0"
+    hour: "0"
+    day: "*"
+    month: "*"
+    weekday: "0"
+    cron_file: "docker-disk-clean-up"
+    user:  "{{ (docker__users | first) | d('root') }}"
+    state: "present"
+
+docker__registries: []
+docker__default_daemon_json: |
+  "log-driver": "journald"
+docker__daemon_flags:
+  - "-H unix://"
+docker__daemon_environment: []
+docker__systemd_override: ""
+
+
+# docker-compose ansible role variables
+
+docker_compose__debug: ""
+docker_compose__restart: "no"
+docker_compose__projects:
+  webserver:
+    project_name: webserver
+    src: webserver
+    dest: /opt/docker-compose/
+    scale_app: 1
+    state: "present"
+
+# php ansible role variables
+
+php_conf_paths: "roles/ansible-docker-compose/files/webserver/php.ini"
+php_short_open_tag: "Off"
+php_precision: 14
+php_output_buffering: "4096"
+php_serialize_precision: "17"
+php_disable_functions: "pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,"
+
+php_expose_php: "off"
+
+php_max_execution_time: "61"
+php_max_input_time: "60"
+php_max_input_vars: "3000"
+php_memory_limit: "256M"
+
+php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
+php_display_errors: "Off"
+php_display_startup_errors: "Off"
+
+php_post_max_size: "32M"
+
+php_realpath_cache_size: "32K"
+
+php_file_uploads: "On"
+php_upload_max_filesize: "64M"
+php_max_file_uploads: "20"
+
+php_allow_url_fopen: "On"
+
+php_date_timezone: "Europe/Amsterdam"
+
+
+php_session_save_handler: files
+php_session_save_path: ''
+php_session_cookie_lifetime: 0
+php_session_gc_probability: 1
+php_session_gc_divisor: 1000
+php_session_gc_maxlifetime: 1440
+
+
+
+

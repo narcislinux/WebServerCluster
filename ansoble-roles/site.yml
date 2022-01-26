@@ -1,0 +1,21 @@
+- hosts: webservers
+  roles:
+    - role: ansible-docker
+      tags: ['docker-role','webserver_install']
+
+    - role: ansible-php
+      tags: ['php-role','webserver_install','webserver_update','update']
+
+    - role: ansible-docker-compose
+      tags: ['docker-compose-role','webserver_install','webserver_update','update']
+
+- hosts: loadbalancers
+  roles:
+    - role: ansible-docker
+      tags: ['docker-role','loadbalancer_install']
+
+    - role: ansible-haproxy
+      tags: ['haproxy-role','loadbalancer_install','loadbalancer_update','update']
+
+    - role: ansible-docker-compose
+      tags: ['docker-compose-role','loadbalancer_install','loadbalancer_update','update']
