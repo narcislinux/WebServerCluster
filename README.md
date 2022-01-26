@@ -18,7 +18,7 @@ Please use centos or ubuntu as a base docker image for the instances.<br/>
 
 ### Project's directory/files structure
 
-The main folder in the project is the 'ansible-roles' directory that includes all the files we need to raise the cluster. I have used the 'ansible roles directory structure' standard and you can find some folders like:
+The main folder in the project is the 'ansible-playbook' directory that includes all the files we need to raise the cluster. I have used the 'ansible roles directory structure' standard and you can find some folders like:
 
 - site.yml, for master playbook
 - roles, for ansible roles 
@@ -27,7 +27,7 @@ The main folder in the project is the 'ansible-roles' directory that includes al
 
 #### roles directory
 ``` bash
-ansible-roles
+ansible-playbook
 ├── ansible.cfg
 ├── group_vars
 │   ├── loadbalancers.yml
@@ -129,7 +129,7 @@ You can see some useful examples of how a project can be used.
 
 #### Full config and install (Docker, Docker-compose, services) 
 ``` bash
-cd ansible-roles
+cd ansible-playbook
 
 ## All nodes 
 ansible-playbook -i inventory.yml -l all site.yml --become 
@@ -143,7 +143,7 @@ ansible-playbook -i inventory.yml -l loadbalancers --tags loadbalancer_install s
 
 #### Install/Manage Docker and docker compose:
 ``` bash
-cd ansible-roles 
+cd ansible-playbook 
 
 ## All nodes 
 ansible-playbook -i inventory.yml -l all --tags dokcer-role site.yml --become 
@@ -168,7 +168,7 @@ services:
 ```
 2- run ansible role
 ``` bash
-cd ansible-roles
+cd ansible-playbook
 
 ## All nodes 
 ansible-playbook -i inventory.yml -l all --tags dokcer-role site.yml --become 
@@ -189,7 +189,7 @@ Before running the project in production, you can test it with vagrant :
 cd vagrant
 vagrant up
 ssh-copy-id vagrant@10.0.0,1.11,12  #password vagrant
-cd ../ansible-roles 
+cd ../ansible-playbook 
 ansible-playbook -i ../vagrant/inventory.yml -l all --tags dokcer-role site.yml --become 
 ```
 
@@ -235,6 +235,8 @@ services:
     restart: always  # <---
 ```
 #### Security
+
 1- Remove public IPs from machines that do not need.
+
 2- Enable firewall (aws, deploy network security across your Amazon VPCs)
-3-
+
